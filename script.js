@@ -1,57 +1,78 @@
 const input = document.getElementById("noteInput");
-const addbtn = document.getElementById("addBtn");
-const list = document.getElementById("noteList")
-addbtn.addEventListener("click", () => {
-    if (input.value === "") {
+const addBtn = document.getElementById("addBtn");
+const deleteBtn = document.getElementById("deleteBtn");
+const themeBtn = document.getElementById("themeBtn");
+const clearBtn = document.getElementById("clearBtn");
+const list = document.getElementById("noteList");
+const status = document.getElementById("status");
+const title = document.getElementById("title");
+const container = document.getElementById("container");
+function updateStatus() {
+    const totalNotes = list.children.length;
+    if (totalNotes === 0) {
+        status.textContent = "No Notes Available";
+    } else {
+        status.textContent = `Total Notes: ${totalNotes}`;
+    }
+    if (totalNotes > 10) {
+        title.style.color = "red";
+    } else {
+        title.style.color = "";
+    }
+}
+function createNote(noteText) {
+    const li = document.createElement("li");
+    li.classList.add("note");
+    li.textContent = noteText;
+    // Single click = mark/unmark
+    li.addEventListener("click", () => {
+        li.classList.toggle("completed");
+    });
+    // Double click = delete note
+    li.addEventListener("dblclick", () => {
+        li.remove();
+        updateStatus();
+    });
+    list.appendChild(li);
+    updateStatus();
+}
+addBtn.addEventListener("click", () => {
+    const noteText = input.value.trim();
+
+    if (noteText === "") {
         return;
     }
-    const li = document.createElement("li");
-    li.textContent = input.value;
-    list.appendChild(li);
+    createNote(noteText);
     input.value = "";
-    updatestatus();
-});
-const update = document.getElementById("status");
-const remove = document.getElementById("deleteBtn");
-remove.addEventListener("click", () => {
-    list.lastElementChild.remove();
-    updatestatus();
-});
-const container = document.getElementById("container");
-const toggle = document.getElementById("themeBtn");
-toggle.addEventListener("click", () => {
-    container.classList.toggle("dark");
-});
-const notes = document.querySelectorAll(".note");
-notes.forEach((note) => {
-    note.addEventListener("click", () => {
-        note.classList.toggle("completed")
-    });
-});
-notes.forEach((note) => {
-    note.addEventListener("dblclick", () => {
-        note.remove();
-    })
-});
-const clearall = document.getElementById("clearBtn");
-clearall.addEventListener("click", () => {
-    list.innerHTML = "";
-    updatestatus();
+    input.focus();
 });
 input.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-        addbtn.click();
+        addBtn.click();
     }
 });
-const title = document.getElementById("title");
-function updatestatus() {
-    if (list.children.length === 0) {
-        update.textContent = "No Notes Available";
-    } else if (list.children.length > 10) {
-        title.style.color = ("red");
-        update.textContent = `Total Notes: ${list.children.length}`;
+deleteBtn.addEventListener("click", () => {
+    if (list.lastElementChild) {
+        list.lastElementChild.remove();
+        updateStatus();
     }
-    else {
-        update.textContent = `Total Notes: ${list.children.length}`;
-    }
-}
+});
+clearBtn.addEventListener("click", () => {
+    list.innerHTML = "";
+    updateStatus();
+});
+themeBtn.addEventListener("click", () => {
+    container.classList.toggle("dark");
+});
+// Add functionality to notes that already exist in HTML
+const existingNotes = document.querySelectorAll(".note");
+existingNotes.forEach((note) => {
+    note.addEventListener("click", () => {
+        note.classList.toggle("completed");
+    });
+    note.addEventListener("dblclick", () => {
+        note.remove();
+        updateStatus();
+    });
+});
+updateStatus();
